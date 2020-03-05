@@ -1,0 +1,18 @@
+dist: xenial
+
+language: python
+
+python:
+  - 3.8
+  - 3.7
+  - 3.6
+
+install:
+  - pip install -U coverage coveralls
+
+
+script: coverage run -a --source=responsemock setup.py test
+
+
+after_success:
+  coveralls
