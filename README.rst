@@ -76,7 +76,7 @@ Access underlying RequestsMock (from ``responses`` package) as ``mock``:
 
 .. code-block:: python
 
-    with response_mock(f'HEAD http://some.domain -> 200 :Nope') as mock:
+    with response_mock('HEAD http://some.domain -> 200 :Nope') as mock:
 
         mock.add_passthru('http://other.domain')
 
