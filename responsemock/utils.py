@@ -1,7 +1,8 @@
 from contextlib import contextmanager
 from typing import Union, List, Generator, Optional
 
-from responses import RequestsMock
+if False:  # pragma: nocover
+    from responses import RequestsMock
 
 
 @contextmanager
@@ -10,7 +11,7 @@ def response_mock(
         *,
         bypass: bool = False,
         **kwargs
-) -> Generator[Optional[RequestsMock], None, None]:
+) -> Generator[Optional['RequestsMock'], None, None]:
     """Simple context manager to mock responses for `requests` package.
 
     Any request under that manager will be intercepted and mocked according
@@ -42,6 +43,8 @@ def response_mock(
     :param kwargs: Additional keyword arguments to pass to `RequestsMock`.
 
     """
+    from responses import RequestsMock
+
     if bypass:
 
         yield

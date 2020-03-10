@@ -2,6 +2,11 @@ pytest-responsemock changelog
 =============================
 
 
+Unreleased
+----------
+* Plugin made friendly to shared virtual envs.
+
+
 v0.1.0 [2020-03-05]
 -------------------
 + Basic functionality.
