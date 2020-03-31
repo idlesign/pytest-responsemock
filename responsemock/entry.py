@@ -24,7 +24,7 @@ def response_mock() -> response_mock_:
 
                 'GET http://a.b -> 200 :Nice',
 
-                f'POST http://some.domain -> 400 :{json_response}'
+                f'POST http://some.domain -> 400 :{json_response}',
 
                 '''
                 GET https://some.domain
@@ -33,7 +33,7 @@ def response_mock() -> response_mock_:
                 Content-Language: ru
 
                 -> 200 :OK
-                '''
+                ''',
 
             ], bypass=False) as mock:
 
