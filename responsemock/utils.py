@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from textwrap import dedent
 from typing import Union, List, Generator, Optional
 
 if False:  # pragma: nocover
@@ -30,7 +31,17 @@ def response_mock(
             with response_mock([
 
                 'GET http://a.b -> 200 :Nice',
+
                 f'POST http://some.domain -> 400 :{json_response}'
+
+                '''
+                GET https://some.domain
+
+                Allow: GET, HEAD
+                Content-Language: ru
+
+                -> 200 :OK
+                '''
 
             ], bypass=False) as mock:
 
@@ -61,7 +72,25 @@ def response_mock(
                 if not rule:
                     continue
 
+                rule = dedent(rule).strip()
                 directives, _, response = rule.partition('->')
+
+                headers = {}
+
+                if '\n' in directives:
+                    directives, *headers_block = directives.splitlines()
+
+                    for header_line in headers_block:
+                        header_line = header_line.strip()
+
+                        if not header_line:
+                            continue
+
+                        key, _, val = header_line.partition(':')
+                        val = val.strip()
+
+                        if val:
+                            headers[key.strip()] = val
 
                 directives = list(filter(None, map(str.strip, directives.split(' '))))
 
@@ -77,6 +106,7 @@ def response_mock(
                     url=directives[1],
                     body=response,
                     status=status,
+                    adding_headers=headers or None,
                 )
 
             yield mock

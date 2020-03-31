@@ -28,7 +28,7 @@ Any request under that manager will be intercepted and mocked according
 to one or more ``rules`` passed to the manager. If actual request won't fall
 under any of given rules then an exception is raised (by default).
 
-Rules are simple strings, of pattern: ``HTTP_METHOD URL -> STATUS_CODE :BODY``.
+Rules are simple strings, of the pattern: ``HTTP_METHOD URL -> STATUS_CODE :BODY``.
 
 
 Requirements
@@ -61,6 +61,22 @@ When this package is installed ``response_mock`` is available for ``pytest`` tes
             assert result.ok
             assert result.content == b'Nice'
 
+
+Describe response header fields using multiline strings:
+
+.. code-block:: python
+
+    with response_mock(
+        '''
+        GET http://some.domain
+
+        Allow: GET, HEAD
+        Content-Language: ru
+
+        -> 200 :OK
+        '''
+    ):
+        ...
 
 Test json response:
 
