@@ -2,8 +2,8 @@ pytest-responsemock changelog
 =============================
 
 
-Unreleased
-----------
+v0.2.0 [2020-03-31]
+-------------------
 + Added support for response header fileds.
 
 
