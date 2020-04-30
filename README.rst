@@ -62,7 +62,7 @@ When this package is installed ``response_mock`` is available for ``pytest`` tes
             assert result.content == b'Nice'
 
 
-Describe response header fields using multiline strings:
+Describe response header fields using multiline lines:
 
 .. code-block:: python
 
