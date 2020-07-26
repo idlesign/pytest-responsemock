@@ -2,8 +2,8 @@ pytest-responsemock changelog
 =============================
 
 
-Unreleased
-----------
+v1.0.0 [2020-07-26]
+-------------------
 + Add support for binary responses.
 
 
