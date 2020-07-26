@@ -89,6 +89,8 @@ Test json response:
 
 To test binary response pass rule as bytes:
 
+.. code-block:: python
+
     with response_mock(b'GET http://some.domain -> 200 :' + my_bytes):
         ...
 
