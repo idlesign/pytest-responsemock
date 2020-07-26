@@ -51,7 +51,7 @@ When this package is installed ``response_mock`` is available for ``pytest`` tes
     def test_me(response_mock):
 
         # Pass response rule as a string,
-        # or many rules (to mock consequent requests) as a list of strings.
+        # or many rules (to mock consequent requests) as a list of strings/bytes.
         # Use optional `bypass` argument to disable mock conditionally.
 
         with response_mock('GET http://some.domain -> 200 :Nice', bypass=False):
