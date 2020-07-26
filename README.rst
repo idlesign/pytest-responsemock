@@ -87,6 +87,10 @@ Test json response:
     with response_mock(f'POST http://some.domain -> 400 :{response}'):
         ...
 
+To test binary response pass rule as bytes:
+
+    with response_mock(b'GET http://some.domain -> 200 :' + my_bytes):
+        ...
 
 Access underlying RequestsMock (from ``responses`` package) as ``mock``:
 

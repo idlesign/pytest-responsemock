@@ -3,12 +3,12 @@ from textwrap import dedent
 from typing import Union, List, Generator, Optional
 
 if False:  # pragma: nocover
-    from responses import RequestsMock
+    from responses import RequestsMock  # noqa
 
 
 @contextmanager
 def response_mock(
-        rules: Union[List[str], str],
+        rules: Union[List[str], str, List[bytes], bytes],
         *,
         bypass: bool = False,
         **kwargs
@@ -32,7 +32,9 @@ def response_mock(
 
                 'GET http://a.b -> 200 :Nice',
 
-                f'POST http://some.domain -> 400 :{json_response}',
+                b'GET http://a.b/binary/ -> 200 :\xd1\x82\xd0\xb5\xd1\x81\xd1\x82',
+
+                f'POST http://some.domain -> 400 :{json_response}'
 
                 '''
                 GET https://some.domain
@@ -41,13 +43,13 @@ def response_mock(
                 Content-Language: ru
 
                 -> 200 :OK
-                ''',
+                '''
 
             ], bypass=False) as mock:
 
                 mock.add_passthru('http://c.d')
 
-                this_mades_requests()
+                this_makes_requests()
 
     :param rules: One or several rules for response.
     :param bypass: Whether to to bypass (disable) mocking.
@@ -64,7 +66,13 @@ def response_mock(
 
         with RequestsMock(**kwargs) as mock:
 
-            if isinstance(rules, str):
+            def enc(val):
+                return val.encode() if is_binary else val
+
+            def dec(val):
+                return val.decode() if is_binary else val
+
+            if isinstance(rules, (str, bytes)):
                 rules = [rules]
 
             for rule in rules:
@@ -72,12 +80,17 @@ def response_mock(
                 if not rule:
                     continue
 
-                rule = dedent(rule).strip()
-                directives, _, response = rule.partition('->')
+                is_binary = isinstance(rule, bytes)
+
+                if not is_binary:
+                    rule = dedent(rule)
+
+                rule = rule.strip()
+                directives, _, response = rule.partition(enc('->'))
 
                 headers = {}
 
-                if '\n' in directives:
+                if (enc('\n')) in directives:
                     directives, *headers_block = directives.splitlines()
 
                     for header_line in headers_block:
@@ -86,24 +99,31 @@ def response_mock(
                         if not header_line:
                             continue
 
-                        key, _, val = header_line.partition(':')
+                        key, _, val = header_line.partition(enc(':'))
                         val = val.strip()
 
                         if val:
-                            headers[key.strip()] = val
+                            headers[dec(key.strip())] = dec(val)
 
-                directives = list(filter(None, map(str.strip, directives.split(' '))))
+                directives = list(
+                    filter(
+                        None,
+                        map(
+                            (bytes if is_binary else str).strip,
+                            directives.split(enc(' '))
+                        )
+                    ))
 
                 assert len(directives) == 2, (
                     f'Unsupported directives: {directives}. Expected: HTTP_METHOD URL')
 
-                status, _, response = response.partition(':')
+                status, _, response = response.partition(enc(':'))
 
                 status = int(status.strip())
 
                 mock.add(
-                    method=directives[0],
-                    url=directives[1],
+                    method=dec(directives[0]),
+                    url=dec(directives[1]),
                     body=response,
                     status=status,
                     adding_headers=headers or None,

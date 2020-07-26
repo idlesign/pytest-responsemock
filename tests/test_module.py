@@ -14,6 +14,20 @@ def test_oneline(response_mock):
         assert result.content == b'Nice'
 
 
+def test_binary(response_mock):
+
+    with response_mock(
+            b'GET http://yandex.ru \n'
+            b'Allow: GET, HEAD\n'
+            b'Content-Language: ru\n'
+            b'-> 200 :\xd1\x82\xd0\xb5\xd1\x81\xd1\x82'
+    ):
+        result = requests.get('http://yandex.ru', allow_redirects=False)
+        assert result.ok
+        assert result.content.decode() == 'тест'
+        assert result.headers['Content-Language'] == 'ru'
+
+
 def test_header_fields(response_mock):
 
     with response_mock('''
