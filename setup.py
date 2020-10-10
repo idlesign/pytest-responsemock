@@ -42,7 +42,7 @@ setup(
 
     install_requires=[
         'pytest',
-        'responses',
+        'responses>=0.6.0',
     ],
     setup_requires=[] + (['pytest-runner'] if 'test' in sys.argv else []) + [],
 

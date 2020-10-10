@@ -56,7 +56,7 @@ def response_mock(
     :param kwargs: Additional keyword arguments to pass to `RequestsMock`.
 
     """
-    from responses import RequestsMock
+    from responses import RequestsMock, UNSET
 
     if bypass:
 
@@ -105,6 +105,8 @@ def response_mock(
                         if val:
                             headers[dec(key.strip())] = dec(val)
 
+                content_type = headers.pop('Content-Type', UNSET)
+
                 directives = list(
                     filter(
                         None,
@@ -127,6 +129,7 @@ def response_mock(
                     body=response,
                     status=status,
                     adding_headers=headers or None,
+                    content_type=content_type,
                 )
 
             yield mock
