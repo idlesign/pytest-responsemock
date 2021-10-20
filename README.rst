@@ -60,6 +60,24 @@ When this package is installed ``response_mock`` is available for ``pytest`` tes
 
             assert result.ok
             assert result.content == b'Nice'
+            
+        # mock consequent requests
+        with response_mock([
+            'GET http://some.domain -> 200 :Nice',
+            'GET http://other.domain -> 200 :Sweet',
+        ]):
+            for_test()
+            requests.get('http://other.domain')
+
+
+Use with ``pytest-datafixtures``:
+
+.. code-block:: python
+
+    def test_me(response_mock, datafix_read):
+
+        with response_mock(f"GET http://some.domain -> 200 :{datafix_read('myresponse.html')}"):
+            ...
 
 
 Describe response header fields using multiline strings:
