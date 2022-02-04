@@ -2,6 +2,11 @@ pytest-responsemock changelog
 =============================
 
 
+Unreleased
+----------
+! Dropped support for Python 3.6.
+
+
 v1.0.1 [2020-10-10]
 -------------------
 * Handle setting 'Content-Type' header correctly.
