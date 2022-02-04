@@ -42,9 +42,11 @@ setup(
 
     install_requires=[
         'pytest',
-        'responses>=0.6.0',
+        'responses>=0.18.0',
     ],
     setup_requires=[] + (['pytest-runner'] if 'test' in sys.argv else []) + [],
+    
+    python_requires=">=3.7",
 
     entry_points={
         'pytest11': ['responsemock = responsemock.entry'],
