@@ -2,8 +2,8 @@ pytest-responsemock changelog
 =============================
 
 
-Unreleased
-----------
+v1.1.0 [2022-02-04]
+-------------------
 ! Dropped support for Python 3.6.
 
 
