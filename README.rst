@@ -31,7 +31,7 @@ Rules are simple strings, of the pattern: ``HTTP_METHOD URL -> STATUS_CODE :BODY
 Requirements
 ------------
 
-* Python 3.6+
+* Python 3.7+
 
 
 Usage
