@@ -2,16 +2,13 @@ pytest-responsemock
 ===================
 https://github.com/idlesign/pytest-responsemock
 
-|release| |lic| |ci| |coverage|
+|release| |lic| |coverage|
 
 .. |release| image:: https://img.shields.io/pypi/v/pytest-responsemock.svg
     :target: https://pypi.python.org/pypi/pytest-responsemock
 
 .. |lic| image:: https://img.shields.io/pypi/l/pytest-responsemock.svg
     :target: https://pypi.python.org/pypi/pytest-responsemock
-
-.. |ci| image:: https://img.shields.io/travis/idlesign/pytest-responsemock/master.svg
-    :target: https://travis-ci.org/idlesign/pytest-responsemock
 
 .. |coverage| image:: https://img.shields.io/coveralls/idlesign/pytest-responsemock/master.svg
     :target: https://coveralls.io/r/idlesign/pytest-responsemock
