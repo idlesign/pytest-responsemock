@@ -56,7 +56,12 @@ def response_mock(
     :param kwargs: Additional keyword arguments to pass to `RequestsMock`.
 
     """
-    from responses import RequestsMock, UNSET
+    from responses import RequestsMock
+    try:
+        # In responses 0.19.0, UNSET was renamed to _UNSET
+        from responses import _UNSET as UNSET
+    except ImportError:
+        from responses import UNSET
 
     if bypass:
 
