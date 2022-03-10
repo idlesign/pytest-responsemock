@@ -52,11 +52,11 @@ def response_mock(
                 this_makes_requests()
 
     :param rules: One or several rules for response.
-    :param bypass: Whether to to bypass (disable) mocking.
+    :param bypass: Whether to bypass (disable) mocking.
     :param kwargs: Additional keyword arguments to pass to `RequestsMock`.
 
     """
-    from responses import RequestsMock, UNSET
+    from responses import RequestsMock
 
     if bypass:
 
@@ -105,7 +105,12 @@ def response_mock(
                         if val:
                             headers[dec(key.strip())] = dec(val)
 
-                content_type = headers.pop('Content-Type', UNSET)
+                add_kwargs = {}
+
+                content_type = headers.pop('Content-Type', None)
+
+                if content_type:
+                    add_kwargs['content_type'] = content_type
 
                 directives = list(
                     filter(
@@ -129,7 +134,7 @@ def response_mock(
                     body=response,
                     status=status,
                     adding_headers=headers or None,
-                    content_type=content_type,
+                    **add_kwargs
                 )
 
             yield mock
