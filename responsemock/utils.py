@@ -121,8 +121,8 @@ def response_mock(
                         )
                     ))
 
-                assert len(directives) == 2, (
-                    f'Unsupported directives: {directives}. Expected: HTTP_METHOD URL')
+                if len(directives) != 2: 
+                    raise ValueError(f'Unsupported directives: {directives}. Expected two entries: HTTP_METHOD and URL')
 
                 status, _, response = response.partition(enc(':'))
 
