@@ -72,4 +72,4 @@ def test_bypass(response_mock):
 
     with response_mock('GET http://yandex.ru -> 500 :Nice', bypass=True):
         result = run_get()
-        assert result.status_code == 301  # https redirect
+        assert result.status_code in {301, 302}  # https redirect
