@@ -1,37 +1,22 @@
-pytest-responsemock changelog
-=============================
+# pytest-responsemock changelog
 
+### v1.1.1 [2022-03-10]
+* ** Made responses 0.19.0 compatible.
 
-v1.1.1 [2022-03-10]
--------------------
-* Made responses 0.19.0 compatible.
+### v1.1.0 [2022-02-04]
+* !! Dropped support for Python 3.6.
 
+### v1.0.1 [2020-10-10]
+* ** Handle setting 'Content-Type' header correctly.
 
-v1.1.0 [2022-02-04]
--------------------
-! Dropped support for Python 3.6.
+### v1.0.0 [2020-07-26]
+* ++ Add support for binary responses.
 
+### v0.2.0 [2020-03-31]
+* ++ Added support for response header fileds.
 
-v1.0.1 [2020-10-10]
--------------------
-* Handle setting 'Content-Type' header correctly.
+### v0.1.1 [2020-03-10]
+* ** Plugin made friendly to shared virtual envs.
 
-
-v1.0.0 [2020-07-26]
--------------------
-+ Add support for binary responses.
-
-
-v0.2.0 [2020-03-31]
--------------------
-+ Added support for response header fileds.
-
-
-v0.1.1 [2020-03-10]
--------------------
-* Plugin made friendly to shared virtual envs.
-
-
-v0.1.0 [2020-03-05]
--------------------
-+ Basic functionality.
+### v0.1.0 [2020-03-05]
+* ++ Basic functionality.

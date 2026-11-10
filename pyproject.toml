@@ -1,0 +1,82 @@
+[project]
+name = "pytest-responsemock"
+dynamic = ["version"]
+description = "Simplified requests calls mocking for pytest"
+authors = [
+    { name = "Igor Starikov", email = "idlesign@yandex.ru" },
+]
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+keywords = ["pytest", "mock", "requests"]
+dependencies = [
+    "pytest",
+    "responses>=0.18.0",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Testing",
+    "License :: OSI Approved :: BSD License",
+]
+
+[project.urls]
+Homepage = "https://github.com/idlesign/pytest-responsemock"
+
+[project.entry-points.pytest11]
+responsemock = "responsemock.entry"
+
+[dependency-groups]
+dev = [
+    { include-group = "docs" },
+    { include-group = "linters" },
+    { include-group = "tests" },
+]
+docs = [
+    "mkdocs-apidescribed-plugin",
+    "mkdocs-material",
+    "mkdocs-navsorted-plugin",
+]
+linters = [
+    "ruff==0.13.1",
+]
+tests = [
+    "coverage",
+    "requests",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/responsemock/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/responsemock"]
+
+[tool.hatch.build.targets.sdist]
+packages = ["src/"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+source = [
+    "src/responsemock",
+]
+
+[tool.makeapp.tests]
+deps = []
