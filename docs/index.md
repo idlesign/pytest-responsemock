@@ -2,7 +2,7 @@
 
 <https://github.com/idlesign/pytest-responsemock>
 
-*Simplified requests calls mocking for pytest*
+*Simplified HTTP calls mocking for pytest (requests, httpx)*
 
 Provides `response_mock` fixture, exposing simple context manager.
 

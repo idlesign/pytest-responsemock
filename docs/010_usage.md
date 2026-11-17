@@ -1,12 +1,40 @@
 # Usage
 
-When this package is installed `response_mock` is available for `pytest` test functions.
+When this package is installed `response_mock` and `aresponse_mock` are available
+for `pytest` test functions.
 
 Any request under that manager will be intercepted and mocked according
 to one or more `rules` passed to the manager. If actual request won't fall
 under any of given rules then an exception is raised (by default).
 
 Rules are simple strings, of the pattern: `HTTP_METHOD URL -> STATUS_CODE :BODY`.
+
+## Backend selection
+
+The `response_mock` manager accepts the `backend` argument to select
+the HTTP client library to intercept:
+
+* `backend='requests'` (default) — intercept `requests` only;
+* `backend='httpx'` — intercept `httpx` (both sync and async clients) only;
+* `backend='all'` — intercept both libraries; the same rules apply to both.
+
+The `aresponse_mock` fixture is a shortcut for `response_mock` with `backend='httpx'`:
+
+```python
+async def test_me(aresponse_mock):
+
+    with aresponse_mock('GET http://some.domain -> 200 :Nice'):
+
+        async with httpx.AsyncClient() as client:
+            result = await client.get('http://some.domain')
+            assert result.status_code == 200
+```
+
+!!! note
+
+    With both backends active (`backend='all'`) the `assert_all_requests_are_fired`
+    option of `RequestsMock` defaults to `False`, since rules may fire through
+    either of the two backends.
 
 ```python
 def for_test():

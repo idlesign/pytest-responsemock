@@ -1,7 +1,7 @@
 [project]
 name = "pytest-responsemock"
 dynamic = ["version"]
-description = "Simplified requests calls mocking for pytest"
+description = "Simplified HTTP calls mocking for pytest (requests, httpx)"
 authors = [
     { name = "Igor Starikov", email = "idlesign@yandex.ru" },
 ]
@@ -9,10 +9,11 @@ readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"
-keywords = ["pytest", "mock", "requests"]
+keywords = ["pytest", "mock", "requests", "httpx"]
 dependencies = [
     "pytest",
     "responses>=0.18.0",
+    "respx",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -53,6 +54,7 @@ linters = [
 tests = [
     "coverage",
     "requests",
+    "httpx",
 ]
 
 [build-system]

@@ -1,19 +1,103 @@
-from contextlib import contextmanager
+from contextlib import ExitStack, contextmanager
 from textwrap import dedent
-from typing import Union, List, Generator, Optional
+from typing import Any, Dict, Generator, List, Literal, Union
 
 if False:  # pragma: nocover
     from responses import RequestsMock  # noqa
 
+TypeRule = Union[str, bytes]
+
+TypeRuleParsed = Dict[str, Union[str, bytes, int, Dict[str, str]]]
+
+
+def parse_rules(rules: Union[List[TypeRule], TypeRule]) -> List[TypeRuleParsed]:
+    """Parses rule strings into structured dicts.
+
+    Rules are simple strings, of pattern: ``HTTP_METHOD URL -> STATUS_CODE :BODY``.
+
+    :param rules: One or several rules for response.
+
+    """
+    parsed = []
+
+    if isinstance(rules, (str, bytes)):
+        rules = [rules]
+
+    for rule in rules:
+
+        if not rule:
+            continue
+
+        is_binary = isinstance(rule, bytes)
+
+        if not is_binary:
+            rule = dedent(rule)
+
+        rule = rule.strip()
+
+        type_ = bytes if is_binary else str
+        newline = b'\n' if is_binary else '\n'
+        colon = b':' if is_binary else ':'
+
+        def enc(val, binary=is_binary):
+            return val.encode() if binary else val
+
+        def dec(val, binary=is_binary):
+            return val.decode() if binary else val
+
+        directives, _, response = rule.partition(enc('->'))
+
+        headers = {}
+
+        if newline in directives:
+            directives, *headers_block = directives.splitlines()
+
+            for header_line in headers_block:
+                header_line = header_line.strip()
+
+                if not header_line:
+                    continue
+
+                key, _, val = header_line.partition(colon)
+                val = val.strip()
+
+                if val:
+                    headers[dec(key.strip())] = dec(val)
+
+        directives = list(
+            filter(
+                None,
+                map(
+                    type_.strip,
+                    directives.split(enc(' '))
+                )
+            ))
+
+        if len(directives) != 2:
+            raise ValueError(f'Unsupported directives: {directives}. Expected two entries: HTTP_METHOD and URL')
+
+        status, _, response = response.partition(colon)
+
+        parsed.append({
+            'method': dec(directives[0]),
+            'url': dec(directives[1]),
+            'status': int(status.strip()),
+            'headers': headers,
+            'body': response,
+        })
+
+    return parsed
+
 
 @contextmanager
 def response_mock(
-        rules: Union[List[str], str, List[bytes], bytes],
+        rules: Union[List[TypeRule], TypeRule],
         *,
         bypass: bool = False,
+        backend: Literal['requests', 'httpx', 'all'] = 'requests',
         **kwargs
-) -> Generator[Optional['RequestsMock'], None, None]:
-    """Simple context manager to mock responses for `requests` package.
+) -> Generator[Any, None, None]:
+    """Simple context manager to mock responses for `requests` and `httpx` packages.
 
     Any request under that manager will be intercepted and mocked according
     to one or more ``rules`` passed to the manager. If actual request won't fall
@@ -53,57 +137,49 @@ def response_mock(
 
     :param rules: One or several rules for response.
     :param bypass: Whether to bypass (disable) mocking.
+    :param backend: Backend selection:
+
+        * ``requests`` (default) — intercept `requests` only;
+        * ``httpx`` — intercept `httpx` (both sync and async clients) only;
+        * ``all`` — intercept both.
+
+        Note that with both backends active the `assert_all_requests_are_fired`
+        option of ``RequestsMock`` defaults to ``False``, since rules may fire
+        through either of the two backends.
+
     :param kwargs: Additional keyword arguments to pass to `RequestsMock`.
 
     """
-    from responses import RequestsMock
-
     if bypass:
 
         yield
+        return
 
-    else:
+    parsed = parse_rules(rules)
 
-        with RequestsMock(**kwargs) as mock:
+    use_requests = backend != 'httpx'
+    use_httpx = backend != 'requests'
 
-            def enc(val):
-                return val.encode() if is_binary else val
+    if not (use_requests or use_httpx):
+        raise ValueError(f'Unsupported backend: {backend}')
 
-            def dec(val):
-                return val.decode() if is_binary else val
+    with ExitStack() as stack:
 
-            if isinstance(rules, (str, bytes)):
-                rules = [rules]
+        mock = None
 
-            for rule in rules:
+        if use_requests:
+            from responses import RequestsMock
 
-                if not rule:
-                    continue
+            if use_httpx:
+                # With two active backends rules may fire through either of them,
+                # so the per-backend "all fired" assertion cannot hold.
+                kwargs.setdefault('assert_all_requests_are_fired', False)
 
-                is_binary = isinstance(rule, bytes)
+            mock = stack.enter_context(RequestsMock(**kwargs))
 
-                if not is_binary:
-                    rule = dedent(rule)
+            for rule in parsed:
 
-                rule = rule.strip()
-                directives, _, response = rule.partition(enc('->'))
-
-                headers = {}
-
-                if (enc('\n')) in directives:
-                    directives, *headers_block = directives.splitlines()
-
-                    for header_line in headers_block:
-                        header_line = header_line.strip()
-
-                        if not header_line:
-                            continue
-
-                        key, _, val = header_line.partition(enc(':'))
-                        val = val.strip()
-
-                        if val:
-                            headers[dec(key.strip())] = dec(val)
+                headers = dict(rule['headers'])
 
                 add_kwargs = {}
 
@@ -112,29 +188,31 @@ def response_mock(
                 if content_type:
                     add_kwargs['content_type'] = content_type
 
-                directives = list(
-                    filter(
-                        None,
-                        map(
-                            (bytes if is_binary else str).strip,
-                            directives.split(enc(' '))
-                        )
-                    ))
-
-                if len(directives) != 2: 
-                    raise ValueError(f'Unsupported directives: {directives}. Expected two entries: HTTP_METHOD and URL')
-
-                status, _, response = response.partition(enc(':'))
-
-                status = int(status.strip())
-
                 mock.add(
-                    method=dec(directives[0]),
-                    url=dec(directives[1]),
-                    body=response,
-                    status=status,
+                    method=rule['method'],
+                    url=rule['url'],
+                    body=rule['body'],
+                    status=rule['status'],
                     adding_headers=headers or None,
                     **add_kwargs
                 )
 
-            yield mock
+        if use_httpx:
+            import respx
+
+            router = stack.enter_context(respx.mock(
+                # Strictness is only possible when no other backend may serve the rules.
+                assert_all_called=not use_requests,
+            ))
+
+            for rule in parsed:
+                router.route(method=rule['method'], url=rule['url']).respond(
+                    status_code=rule['status'],
+                    content=rule['body'],
+                    headers=rule['headers'] or None,
+                )
+
+            if mock is None:
+                mock = router
+
+        yield mock

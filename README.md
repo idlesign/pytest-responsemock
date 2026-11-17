@@ -8,7 +8,7 @@
 
 ## Description
 
-*Simplified requests calls mocking for pytest*
+*Simplified HTTP calls mocking for pytest (requests, httpx)*
 
 Provides `response_mock` fixture, exposing simple context manager.
 
@@ -17,6 +17,10 @@ to one or more `rules` passed to the manager. If actual request won't fall
 under any of given rules then an exception is raised (by default).
 
 Rules are simple strings, of the pattern: `HTTP_METHOD URL -> STATUS_CODE :BODY`.
+
+Requests made with both `requests` and `httpx` (sync and async clients) are intercepted.
+Use the `backend` manager argument (`requests`/`httpx`/`all`) to select the backend,
+or the `aresponse_mock` fixture as an `httpx`-oriented shortcut.
 
 ## Requirements
 
