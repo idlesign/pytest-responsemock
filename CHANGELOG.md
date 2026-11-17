@@ -1,6 +1,6 @@
 # pytest-responsemock changelog
 
-### Unreleased
+### v2.0.0 [2026-11-17]
 * ++ Added httpx support (sync and async clients) via respx package: `backend` argument of `response_mock` manager selects the backend (`requests`/`httpx`/`all`), `aresponse_mock` fixture is an httpx-oriented shortcut.
 
 ### v1.1.1 [2022-03-10]
